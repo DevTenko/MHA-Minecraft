@@ -1,189 +1,167 @@
 package devtenko.mhaminecraft;
-
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.*;
+import java.util.Random;
 
 public class quirk_object {
     String name;
     String ability;
-    Entity attacked_player;
+    Player attacked_player;
+    Integer time_till_next_quirk = 0;
+    boolean player_hit_player = false;
+    Action action_event;
     MHAMinecraft plugin;
-    public LinkedList<String> player_deactivated_quirks = new LinkedList<String>();
-    public quirk_object(MHAMinecraft plugin,String name,String ability){
+    event_handler eventHandler;
+    Material attack_weapon;
+    public quirk_object(MHAMinecraft plugin,event_handler event_handler,String name,String ability, int last_activation){
         this.name = name;
         this.plugin = plugin;
         this.ability = ability;
+        this.time_till_next_quirk = last_activation;
+        this.eventHandler = event_handler;
     }
 
-    public void activate(int x, int y,int z){
+    public void activate(){
         Player p = plugin.getServer().getPlayer(name);
-            if (ability.equalsIgnoreCase("Overhaul")) {
-                Overhaul(p);
-            } else if (ability.equalsIgnoreCase("Hardening")) {
-                Hardening(p);
-            } else if (attacked_player != null && ability.equalsIgnoreCase("Erasure")) {
-                player_deactivated_quirks =  Erasure(p,attacked_player);
-            } else if (ability.equalsIgnoreCase("Decay")) {
-                Decay(p);
-            } else if (ability.equalsIgnoreCase("Explosion")) {
-                Explosion(p);
-            } else if (ability.equalsIgnoreCase("Warp")) {
-                Warp(p, x, y, z);
-            }
-            else if (ability.equalsIgnoreCase("Hell_Flame")) {
-                hell_flame(p);
-            }
-            else if (attacked_player != null && ability.equalsIgnoreCase("Paralyze")) {
-                Player c_player = (Player) attacked_player;
-                Paralyze(c_player);
-                attacked_player = null;
-            }
-            else if (ability.equalsIgnoreCase("Gravity")) {
-                gravity(p);
-            }
-            else if (ability.equalsIgnoreCase("Compress")) {
-                compress(p,attacked_player);
-            }
-            else {
-                return;
-            }
-    }
-    private void Overhaul(Player p){
-        LinkedList<Integer> coords = get_player_coordinates(p);
-        for(int z = -5; z < 5; z++){
-            for(int x = -5; x < 5; x++){
-                for(int y = -5; y < 5;y++){
-                    p.getWorld().getBlockAt(coords.get(0) - x,coords.get(1) - y,coords.get(2)-z).breakNaturally();
+        if(p.getInventory().getItemInMainHand().getType() != Material.STICK && p.getInventory().getItemInMainHand().getType() != Material.WOODEN_HOE)return;
+        attack_weapon = p.getInventory().getItemInMainHand().getType();
+        if(time_till_next_quirk > 0)return;
+        if(ability.equalsIgnoreCase("Overhaul")){
+
+            if(action_event.equals(Action.LEFT_CLICK_BLOCK) && attack_weapon.equals(Material.STICK)){
+                int x_coordinate = (int) p.getLocation().getX();
+                int y_coordinate = (int) p.getLocation().getY();
+                int z_coordinate = (int) p.getLocation().getZ();
+                for(int x = -5; x < 5; x++){
+                    for(int z = -5; z <5;z++){
+                        for(int y = -5; y < 5; y++){
+                            if(!(x == 1 && z ==1)){
+                                p.getWorld().getBlockAt(x_coordinate -x,y_coordinate- y,z_coordinate-z).breakNaturally();
+                            }
+                        }
+                    }
                 }
             }
-        }
-        p.teleport(new Location(p.getWorld(),coords.get(0),1+p.getWorld().getHighestBlockYAt(coords.get(0),coords.get(2)),coords.get(2)));
-    }
-
-    private void Hardening(Player p) {
-        ItemStack diamond_helmet = new ItemStack(Material.DIAMOND_HELMET);
-        ItemStack diamond_chestplate = new ItemStack(Material.DIAMOND_CHESTPLATE);
-        ItemStack diamond_leggings = new ItemStack(Material.DIAMOND_LEGGINGS);
-        ItemStack diamond_boots = new ItemStack(Material.DIAMOND_BOOTS);
-        diamond_helmet.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL,1);
-        diamond_chestplate.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL,1);
-        diamond_leggings.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL,1);
-        diamond_boots.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL,1);
-        p.getInventory().setBoots(diamond_boots);
-        p.getInventory().setChestplate(diamond_chestplate);
-        p.getInventory().setHelmet(diamond_helmet);
-        p.getInventory().setLeggings(diamond_leggings);
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                p.getInventory().setBoots(null);
-                p.getInventory().setChestplate(null);
-                p.getInventory().setHelmet(null);
-                p.getInventory().setLeggings(null);
+            else if(action_event.equals(null) && attacked_player != null && attack_weapon.equals(Material.STICK)){
+                attacked_player.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 1,3));
+                player_hit_player = false;
             }
-        }, 140);
-    }
-
-    private LinkedList<String> Erasure(Player p, Entity target){
-       LinkedList<String> player_list = new LinkedList<String>();
-           if (target instanceof Player) {
-              Player temp_player = ((Player) target).getPlayer();
-              player_list.add(temp_player.getDisplayName());
-       }
-       return player_list;
-    }
-
-    private void Decay(Player p){
-        LinkedList<Integer> coords =get_player_coordinates(p);
-        for(int z = -10; z < 10; z++){
-            for(int x = -10; x < 10; x++){
-                for(int y = -10; y < 10;y++){
-                    p.getWorld().getBlockAt(coords.get(0)-x,coords.get(1)-y,coords.get(2)-z).setType(Material.AIR);
+            time_till_next_quirk = 7;
+        }
+        else if(ability.equalsIgnoreCase("Compress")){
+            System.out.println("4");
+            if(player_hit_player && attacked_player != null && (plugin.getConfig().getString("Compress."+p.getDisplayName()) == null || plugin.getConfig().getString("Compress."+p.getDisplayName()) == "")&& attack_weapon.equals(Material.STICK)){
+                System.out.println("5");
+                attacked_player.teleport(new Location(p.getWorld(),1000,1000,1000));
+                attacked_player.setGameMode(GameMode.SPECTATOR);
+                plugin.getConfig().set("Compress."+p.getDisplayName(), attacked_player.getDisplayName());
+                plugin.saveConfig();
+                player_hit_player = false;
+            }
+            else if((plugin.getConfig().getString("Compress."+p.getDisplayName()) != null || plugin.getConfig().getString("Compress."+p.getDisplayName()) != "")&& attack_weapon.equals(Material.STICK)){
+                System.out.println("6");
+                plugin.getServer().getPlayer(plugin.getConfig().getString("Compress."+p.getDisplayName())).teleport(p.getLocation());
+                plugin.getServer().getPlayer(plugin.getConfig().getString("Compress."+p.getDisplayName())).setGameMode(GameMode.SURVIVAL);
+                plugin.getConfig().set("Compress."+p.getDisplayName(),"");
+                plugin.saveConfig();
+                player_hit_player = false;
+            }
+            time_till_next_quirk = 7;
+        }
+        else if(ability.equalsIgnoreCase("Gravity")){
+            if((player_hit_player == true && attacked_player != null)&& attack_weapon.equals(Material.STICK)){
+                attacked_player.teleport(p.getLocation().add(0,10,0));
+                player_hit_player = false;
+            }
+            else if(((action_event.equals(Action.RIGHT_CLICK_AIR) || action_event.equals(Action.RIGHT_CLICK_BLOCK))&& attack_weapon.equals(Material.STICK))&& attack_weapon.equals(Material.STICK)){
+                p.teleport(p.getLocation().add(0,100,0));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,1,25));
+            }
+            time_till_next_quirk = 7;
+        }
+        else if(ability.equalsIgnoreCase("Permeation")){
+            if((action_event.equals(Action.RIGHT_CLICK_AIR) || action_event.equals(Action.RIGHT_CLICK_BLOCK))&& attack_weapon.equals(Material.STICK)){
+                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,10000,10000));
+                p.setGameMode(GameMode.SPECTATOR);
+                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        p.setGameMode(GameMode.SURVIVAL);
+                        p.removePotionEffect(PotionEffectType.BLINDNESS);
+                        time_till_next_quirk = 7;
+                    }
+                },80);
+            }
+        }
+        else if(ability.equalsIgnoreCase("Warp")){
+            if((action_event.equals(Action.RIGHT_CLICK_AIR) || action_event.equals(Action.RIGHT_CLICK_BLOCK))&& attack_weapon.equals(Material.STICK)){
+                Random random = new Random();
+                int new_location = (random.nextInt(100) -50);
+                int new_x = (int) (p.getLocation().getX()- new_location);
+                int new_z = (int) (p.getLocation().getZ()- new_location);
+                p.teleport(new Location(p.getWorld(), new_x, p.getWorld().getHighestBlockAt(new_x,new_z).getY(), new_z));
+            }
+            else if((action_event.equals(Action.RIGHT_CLICK_AIR) || action_event.equals(Action.RIGHT_CLICK_BLOCK))&& attack_weapon.equals(Material.WOODEN_HOE)){
+                Random random = new Random();
+                int y = random.nextInt(75);
+                int x = random.nextInt(60) -30;
+                int z = random.nextInt(60) -30;
+                if(p.getWorld() == p.getServer().getWorld(plugin.getConfig().getString("World.Normal"))) {
+                    if(plugin.getServer().getWorld(plugin.getConfig().getString("World.Nether")).getBlockAt(x, y,z).getType() == Material.AIR ){
+                        p.teleport(new Location(plugin.getServer().getWorld(plugin.getConfig().getString("World.Nether")),x, y,z));
+                        p.getWorld().getBlockAt(x,y-3,z).setType(Material.COBBLESTONE);
+                        this.time_till_next_quirk = 7;
+                    }
+                    else{
+                        this.time_till_next_quirk = 0;
+                    }
+                }
+                else if(p.getWorld() == p.getServer().getWorld(plugin.getConfig().getString("World.Nether"))){
+                    p.teleport(plugin.getServer().getWorld(plugin.getConfig().getString("World.End")).getHighestBlockAt(x, z).getLocation());
+                    this.time_till_next_quirk = 7;
+                }
+                else if(p.getWorld() == p.getServer().getWorld(plugin.getConfig().getString("World.End"))){
+                    p.teleport(plugin.getServer().getWorld(plugin.getConfig().getString("World.Normal")).getHighestBlockAt(x, z).getLocation());
+                    this.time_till_next_quirk = 7;
                 }
             }
-        }
-        p.teleport(new Location(p.getWorld(),coords.get(0),1+p.getWorld().getHighestBlockYAt(coords.get(0),coords.get(2)),coords.get(2)));
-    }
-
-    private void Explosion(Player p) {
-        Location current_position = p.getLocation();
-        current_position.getWorld().spawn(current_position.add(p.getLocation().getDirection()), TNTPrimed.class).setVelocity(p.getLocation().getDirection().normalize().multiply(2));
-        get_scheduler(plugin).scheduleSyncDelayedTask(plugin, new Runnable() {
-            @Override
-            public void run() {
-                current_position.getWorld().spawn(current_position.add(p.getLocation().getDirection()), TNTPrimed.class).setVelocity(p.getLocation().getDirection().normalize().multiply(2));
+            else if((player_hit_player == true && attacked_player != null)&& attack_weapon.equals(Material.STICK)){
+                Random random = new Random();
+                int new_location = (random.nextInt(100) -50);
+                attacked_player.teleport(new Location(p.getWorld(), p.getLocation().getX()- new_location, p.getWorld().getHighestBlockAt(((int) p.getLocation().getX() - new_location), (int) (p.getLocation().getZ()- new_location)).getY(),p.getLocation().getZ()));
+                player_hit_player = false;
             }
-        },10);
-    }
-
-    private void Warp(Player p, int x,int y, int z){
-        p.teleport(new Location(p.getWorld(),x,y,z));
-    }
-
-    private void Paralyze(Player hit){
-        if(hit == null) return;
-        Random random = new Random();
-        int slow_time = (random.nextInt(20) - 10) * 20;
-        hit.addPotionEffect(new PotionEffect(PotionEffectType.SLOW,slow_time,5000));
-    }
-
-    private void hell_flame(Player p){
-        p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE,400,1000));
-        LinkedList<Integer> coordinates = get_player_coordinates(p);
-        for(int x = -5; x < 5;x++){
-            for(int z = -5; z< 5;z++){
-                p.getWorld().getBlockAt(coordinates.get(0) - x,p.getWorld().getHighestBlockYAt(coordinates.get(0) -x,coordinates.get(2)-z),coordinates.get(2) - z).setType(Material.FIRE);
+            time_till_next_quirk = 7;
+        }
+        else if(ability.equalsIgnoreCase("Eraser")){
+            if(player_hit_player == true && attacked_player != null && attack_weapon.equals(Material.STICK)){
+                eventHandler.player_quirks.get(attacked_player).time_till_next_quirk = eventHandler.player_quirks.get(attacked_player).time_till_next_quirk + 20;
+                p.sendMessage("Quirk Erased");
+                attacked_player.sendMessage("Your quirk has been erased");
+                time_till_next_quirk = 7;
+                player_hit_player = false;
             }
         }
-    }
 
-    private void gravity(Player p){
-        List<Entity> entity = p.getNearbyEntities(5,5,5);
-        for(int i =0; i < entity.size(); i++){
-            entity.get(i).teleport(new Location(p.getWorld(),entity.get(i).getLocation().getX(),entity.get(i).getLocation().getY() + 10,entity.get(i).getLocation().getZ()));
-        }
-    }
-
-    private void compress(Player p, Entity attacked){
-        if(plugin.getConfig().getString("Compress."+p.getDisplayName()) == null || plugin.getConfig().getString("Compress."+p.getDisplayName()) == ""){
-            if(!(attacked instanceof Player)){
-                return;
+        else if(ability.equalsIgnoreCase("Explosion")){
+            if((action_event.equals(Action.RIGHT_CLICK_BLOCK) || action_event.equals(Action.RIGHT_CLICK_AIR))&& attack_weapon.equals(Material.STICK)){
+                p.getWorld().spawn(p.getLocation(), TNTPrimed.class).setVelocity(p.getLocation().getDirection().multiply(2));
+                plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                    @Override
+                    public void run() {
+                        p.getWorld().spawn(p.getLocation(), TNTPrimed.class).setVelocity(p.getLocation().getDirection().multiply(2));
+                        time_till_next_quirk = 7;
+                    }
+                },10);
             }
-            ((Player) attacked).getPlayer().teleport(new Location(p.getWorld(),1000,1000,1000));
-            ((Player) attacked).getPlayer().setGameMode(GameMode.SPECTATOR);
-            plugin.getConfig().set("Compress."+p.getDisplayName(),((Player) attacked).getPlayer().getDisplayName());
-            plugin.saveConfig();
         }
-        else if(plugin.getConfig().getString("Compress."+p.getDisplayName()) != null || plugin.getConfig().getString("Compress."+p.getDisplayName()) != ""){
-            plugin.getServer().getPlayer(plugin.getConfig().getString("Compress."+p.getDisplayName())).teleport(new Location(p.getWorld(),p.getLocation().getX(),p.getLocation().getY(),p.getLocation().getZ()));
-            plugin.getServer().getPlayer(plugin.getConfig().getString("Compress."+p.getDisplayName())).setGameMode(GameMode.SURVIVAL);
-            plugin.getConfig().set("Compress."+p.getDisplayName(),"");
-            plugin.saveConfig();
-        }
-        else{
-            return;
-        }
-    }
-
-    private LinkedList<Integer> get_player_coordinates(Player p){
-        LinkedList<Integer> coordinates_list = new LinkedList<Integer>();
-        coordinates_list.add((int) p.getLocation().getX());
-        coordinates_list.add((int) p.getLocation().getY());
-        coordinates_list.add((int) p.getLocation().getZ());
-        return coordinates_list;
-    }
-    private BukkitScheduler get_scheduler(MHAMinecraft plugin){
-        return(plugin.getServer().getScheduler());
     }
 }

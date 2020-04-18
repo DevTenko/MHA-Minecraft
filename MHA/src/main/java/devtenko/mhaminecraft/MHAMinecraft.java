@@ -1,5 +1,6 @@
 package devtenko.mhaminecraft;
 
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -11,12 +12,14 @@ public final class MHAMinecraft extends JavaPlugin {
     private boolean begin = false;
     private event_handler eventHandler;
     private config_manager configManager;
+    private  world_border world_border_object;
     @Override
     public void onEnable() {
         configManager = new config_manager(this);
         if(begin == false) {
             this.getServer().getWorld("world").setPVP(false);
         }
+        getCommand("switch").setTabCompleter(new tab_complete());
     }
 
     @Override
@@ -33,6 +36,13 @@ public final class MHAMinecraft extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(sender instanceof Player) {
             if (command.getName().equalsIgnoreCase("start") && sender.isOp()) {
+                for(Player p : getServer().getOnlinePlayers()){
+                    p.getInventory().clear();
+                    p.setHealth(20);
+                    p.setFoodLevel(20);
+                    p.teleport(new Location(p.getWorld(),0,p.getWorld().getHighestBlockYAt(0,0),0));
+                }
+                world_border_object = new world_border(this);
                 eventHandler = new event_handler(this);
                 begin = true;
 
@@ -64,6 +74,7 @@ public final class MHAMinecraft extends JavaPlugin {
                 Player p = (Player) sender;
                 this.getConfig().set("Class."+p.getDisplayName(), args[0]);
                 this.saveConfig();
+                p.sendMessage("Your Quirk has been switched");
                 return true;
             }
             return false;
