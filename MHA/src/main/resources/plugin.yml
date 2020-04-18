@@ -1,5 +1,5 @@
 name: MHAMinecraft
-version: 2.0
+version: 3.0
 main: devtenko.mhaminecraft.MHAMinecraft
 api-version: 1.13
 authors: [DevTenko]
@@ -7,6 +7,18 @@ commands:
   start:
     usage: "Usage: /start"
     description: Starts game only for OP
+  discord_token:
+    usage: "Usage: /discord_token"
+    description: Sets Discord Token only for OP
+  discord_text_channel:
+    usage: "Usage: /discord_text_channel"
+    description: Sets Discord Text Channel only for OP
+  discord_guild_id:
+    usage: "Usage: /discord_guild_id"
+    description: Sets Discord Guild ID only for OP
   switch:
-    usage: "Usage: /switch [decay|overhaul|gravity|hell_flame|comrpess|erasure|warp|hardening|permeation]"
+    usage: "Usage: /switch [Quirk]"
+    description: Works for all players before game start
+  team:
+    usage: "Usage: /team [team id]"
     description: Works for all players before game start

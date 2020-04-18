@@ -1,9 +1,11 @@
 package devtenko.mhaminecraft;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -11,15 +13,23 @@ import java.util.HashMap;
 public class event_handler implements Listener {
     MHAMinecraft plugin;
     scoreboard_manager scoreboard_manager_object;
+    discord_handler discord_handler_object;
     BukkitScheduler scheduler;
     public HashMap<Player,quirk_object> player_quirks = new HashMap<Player, quirk_object>();
-    public event_handler(MHAMinecraft plugin){
+    public event_handler(MHAMinecraft plugin) {
         this.plugin = plugin;
+        try {
+            discord_handler_object = new discord_handler(plugin.getConfig().getString("Discord.Token"),plugin.getConfig().getLong("Discord.Guild_ID"),plugin.getConfig().getLong("Discord.Text_Channel"));
+            discord_handler_object.send_message("Game has Begun");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         Bukkit.getPluginManager().registerEvents(this,plugin);
         scoreboard_manager_object = new scoreboard_manager();
         scheduler = plugin.getServer().getScheduler();
         for(Player p : plugin.getServer().getOnlinePlayers()){
-            player_quirks.put(p,new quirk_object(plugin,this,p.getDisplayName(),plugin.getConfig().getString("Class."+p.getDisplayName()),0));
+            player_quirks.put(p,new quirk_object(plugin,this,p.getDisplayName(),plugin.getConfig().getString("Class."+p.getDisplayName()),0,plugin.getConfig().getInt("Team."+p.getDisplayName())));
         }
         scheduler.scheduleSyncRepeatingTask(plugin, new Runnable() {
             @Override
@@ -38,11 +48,16 @@ public class event_handler implements Listener {
         if(e.getEntity() instanceof Player && e.getDamager() instanceof  Player){
             Player attacked_player = ((Player) e.getEntity()).getPlayer();
             Player attacker_player = ((Player) e.getDamager()).getPlayer();
-            player_quirks.get(attacker_player).attacked_player = attacked_player;
-            player_quirks.get(attacker_player).action_event = null;
-            player_quirks.get(attacker_player).player_hit_player = true;
-            player_quirks.get(attacker_player).activate();
-            System.out.println("7");
+            if(player_quirks.get(attacker_player).team_id == 0 || player_quirks.get(attacked_player).team_id != player_quirks.get(attacker_player).team_id) {
+                player_quirks.get(attacker_player).attacked_player = attacked_player;
+                player_quirks.get(attacker_player).action_event = null;
+                player_quirks.get(attacker_player).player_hit_player = true;
+                player_quirks.get(attacker_player).activate();
+            }
+            else{
+                e.setCancelled(true);
+            }
+                System.out.println("7");
         }
         else if(e.getDamager() instanceof  Player && player_quirks.get(e.getDamager()).ability.equalsIgnoreCase("Compress")){
             System.out.println("1");
@@ -76,5 +91,12 @@ public class event_handler implements Listener {
         if(player_quirks.get(e.getPlayer()).ability.equalsIgnoreCase("Permeation")){
             return;
         }
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e){
+        discord_handler_object.send_message(e.getEntity().getDisplayName() + " has died");
+        e.getEntity().getServer().broadcastMessage(e.getEntity().getDisplayName() +" has died at " + e.getEntity().getLocation().getX() + "," +e.getEntity().getLocation().getY() + "," +e.getEntity().getLocation().getZ());
+        e.getEntity().getPlayer().setGameMode(GameMode.SPECTATOR);
     }
 }

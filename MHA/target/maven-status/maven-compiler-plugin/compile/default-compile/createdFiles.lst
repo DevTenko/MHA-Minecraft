@@ -6,6 +6,7 @@ devtenko\mhaminecraft\MHAMinecraft$3.class
 devtenko\mhaminecraft\world_border.class
 devtenko\mhaminecraft\event_handler$1.class
 devtenko\mhaminecraft\config_manager.class
+devtenko\mhaminecraft\discord_handler.class
 devtenko\mhaminecraft\quirk_object$2.class
 devtenko\mhaminecraft\tab_complete.class
 devtenko\mhaminecraft\event_handler.class

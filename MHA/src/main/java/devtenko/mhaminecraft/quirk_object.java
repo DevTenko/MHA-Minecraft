@@ -21,12 +21,14 @@ public class quirk_object {
     MHAMinecraft plugin;
     event_handler eventHandler;
     Material attack_weapon;
-    public quirk_object(MHAMinecraft plugin,event_handler event_handler,String name,String ability, int last_activation){
+    int team_id;
+    public quirk_object(MHAMinecraft plugin,event_handler event_handler,String name,String ability, int last_activation, int team_id){
         this.name = name;
         this.plugin = plugin;
         this.ability = ability;
         this.time_till_next_quirk = last_activation;
         this.eventHandler = event_handler;
+        this.team_id = team_id;
     }
 
     public void activate(){
@@ -83,7 +85,7 @@ public class quirk_object {
             }
             else if(((action_event.equals(Action.RIGHT_CLICK_AIR) || action_event.equals(Action.RIGHT_CLICK_BLOCK))&& attack_weapon.equals(Material.STICK))&& attack_weapon.equals(Material.STICK)){
                 p.teleport(p.getLocation().add(0,100,0));
-                p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,1,25));
+                p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING,600,1));
             }
             time_till_next_quirk = 7;
         }
