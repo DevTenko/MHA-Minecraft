@@ -12,16 +12,16 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Random;
 
 public class quirk_object {
-    String name;
-    String ability;
-    Player attacked_player;
-    Integer time_till_next_quirk = 0;
-    boolean player_hit_player = false;
-    Action action_event;
-    MHAMinecraft plugin;
-    event_handler eventHandler;
-    Material attack_weapon;
-    int team_id;
+    private String name;
+    protected String ability;
+    protected Player attacked_player;
+    protected Integer time_till_next_quirk = 0;
+    protected boolean player_hit_player = false;
+    protected Action action_event;
+    private MHAMinecraft plugin;
+    private event_handler eventHandler;
+    protected Material attack_weapon;
+    protected int team_id;
     public quirk_object(MHAMinecraft plugin,event_handler event_handler,String name,String ability, int last_activation, int team_id){
         this.name = name;
         this.plugin = plugin;

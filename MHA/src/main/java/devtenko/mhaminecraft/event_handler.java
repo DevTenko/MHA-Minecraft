@@ -19,7 +19,7 @@ public class event_handler implements Listener {
     public event_handler(MHAMinecraft plugin) {
         this.plugin = plugin;
         try {
-            discord_handler_object = new discord_handler(plugin.getConfig().getString("Discord.Token"),plugin.getConfig().getLong("Discord.Guild_ID"),plugin.getConfig().getLong("Discord.Text_Channel"));
+            discord_handler_object = new discord_handler(plugin.getConfig().getString("Discord.Token"),plugin.getConfig().getLong("Discord.Text_Channel"));
             discord_handler_object.send_message("Game has Begun");
         }
         catch (Exception e){
@@ -89,7 +89,7 @@ public class event_handler implements Listener {
     @EventHandler
     public void onTeleport(PlayerTeleportEvent e){
         if(player_quirks.get(e.getPlayer()).ability.equalsIgnoreCase("Permeation")){
-            return;
+            e.setCancelled(true);
         }
     }
 
