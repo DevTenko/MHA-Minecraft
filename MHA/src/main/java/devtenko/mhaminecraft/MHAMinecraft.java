@@ -1,18 +1,27 @@
 package devtenko.mhaminecraft;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
+
+import java.util.HashMap;
 
 
 public final class MHAMinecraft extends JavaPlugin {
     private boolean begin = false;
     private event_handler eventHandler;
     private config_manager configManager;
-    private  world_border world_border_object;
+    private world_border world_border_object;
+    protected HashMap<Player,quirk_class> player_quirks = new HashMap<Player, quirk_class>();
     @Override
     public void onEnable() {
         configManager = new config_manager(this);
@@ -40,6 +49,12 @@ public final class MHAMinecraft extends JavaPlugin {
                     if(command.getName().equalsIgnoreCase("start")){
                         return start_game(sender);
                     }
+                    else if(command.getName().equalsIgnoreCase("points")){
+                        for(Player p: getServer().getOnlinePlayers()){
+                            sender.sendMessage(p.getDisplayName() + " Has " + getConfig().getInt("Points.Team_"+player_quirks.get(p).team_id) + " Points ");
+                        }
+                        return true;
+                    }
                 }
                 else{
                     if(command.getName().equalsIgnoreCase("discord_token")){
@@ -65,6 +80,14 @@ public final class MHAMinecraft extends JavaPlugin {
                         return update_team(sender,args);
                     }
                 }
+                else if(args.length <= 0){
+                    if(command.getName().equalsIgnoreCase("points")){
+                        for(Player p: getServer().getOnlinePlayers()){
+                            sender.sendMessage(p.getDisplayName() + " Has " + getConfig().getInt("Points.Team_"+player_quirks.get(p).team_id) + " Points ");
+                        }
+                        return true;
+                    }
+                }
             }
         }
         else{
@@ -87,14 +110,15 @@ public final class MHAMinecraft extends JavaPlugin {
         return false;
     }
     private boolean start_game(CommandSender sender){
+        world_border_object = new world_border(this);
+
+        begin = true;
         for(Player p : getServer().getOnlinePlayers()) {
+            player_quirks.put(p,new quirk_class(this,p,getConfig().getString("Class."+p.getDisplayName()),getConfig().getInt("Team."+p.getDisplayName())));
             p.getInventory().clear();
             p.setHealth(20);
             p.setFoodLevel(20);
             p.teleport(new Location(p.getWorld(), 0, p.getWorld().getHighestBlockYAt(0, 0) + 2, 0));
-            world_border_object = new world_border(this);
-            eventHandler = new event_handler(this);
-            begin = true;
             int time_till_pvp = this.getConfig().getInt("Timer") * 20 * 60;
             BukkitScheduler scheduler = this.getServer().getScheduler();
             getServer().broadcastMessage("PvP Starts in " + this.getConfig().getInt("Timer") + " Minutes");
@@ -117,7 +141,20 @@ public final class MHAMinecraft extends JavaPlugin {
                     sender.getServer().getWorld("world").setPVP(true);
                 }
             },time_till_pvp-20);
+            update_scoreboard(p,player_quirks.get(p).quirk_time);
         }
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                for(Player p: getServer().getOnlinePlayers()){
+                    if(player_quirks.get(p).quirk_time >= 0){
+                        update_scoreboard(p,player_quirks.get(p).quirk_time);
+                        player_quirks.get(p).quirk_time = player_quirks.get(p).quirk_time - 1;
+                    }
+                }
+            }
+        },0,20);
+        eventHandler = new event_handler(this);
         return true;
     }
     private boolean update_token(String args[]){
@@ -143,5 +180,14 @@ public final class MHAMinecraft extends JavaPlugin {
         this.saveConfig();
         p.sendMessage("Your Team has been switched");
         return true;
+    }
+    private void update_scoreboard(Player p, int time_till_next_quirk){
+            String time_left = String.valueOf(time_till_next_quirk);
+            Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+            Objective objective =scoreboard.registerNewObjective("test", "dummy", ChatColor.RED + "Time Till Quirk");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            Score score = objective.getScore(ChatColor.RED + "Time Till Quirk: " + time_left);
+            score.setScore(1);
+            p.setScoreboard(scoreboard);
     }
 }

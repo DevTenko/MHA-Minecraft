@@ -4,12 +4,11 @@ devtenko\mhaminecraft\MHAMinecraft$2.class
 devtenko\mhaminecraft\world_border$1.class
 devtenko\mhaminecraft\MHAMinecraft$3.class
 devtenko\mhaminecraft\world_border.class
-devtenko\mhaminecraft\event_handler$1.class
 devtenko\mhaminecraft\config_manager.class
+devtenko\mhaminecraft\MHAMinecraft$4.class
+devtenko\mhaminecraft\quirk_class.class
 devtenko\mhaminecraft\discord_handler.class
-devtenko\mhaminecraft\quirk_object$2.class
+devtenko\mhaminecraft\quirk_class$2.class
 devtenko\mhaminecraft\tab_complete.class
 devtenko\mhaminecraft\event_handler.class
-devtenko\mhaminecraft\scoreboard_manager.class
-devtenko\mhaminecraft\quirk_object$1.class
-devtenko\mhaminecraft\quirk_object.class
+devtenko\mhaminecraft\quirk_class$1.class

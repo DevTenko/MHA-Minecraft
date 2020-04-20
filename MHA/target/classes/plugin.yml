@@ -22,3 +22,6 @@ commands:
   team:
     usage: "Usage: /team [team id]"
     description: Works for all players before game start
+  points:
+    usage: "Usage: /points"
+    description: Gets points for all players
