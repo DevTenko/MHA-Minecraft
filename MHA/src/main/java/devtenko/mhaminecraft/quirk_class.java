@@ -20,6 +20,7 @@ public class quirk_class {
     Player attacked_player = null;
     Action player_action;
     Random random;
+    boolean paralyze = false;
     int team_id;
     public quirk_class(MHAMinecraft plugin, Player p, String quirk_name,int team_id){
         this.player = p;
@@ -31,9 +32,7 @@ public class quirk_class {
     }
 
     public void activate(){
-        System.out.println("OK Boomer 1");
         if((player.getItemInHand().getType().equals(Material.STICK) || player.getItemInHand().equals(Material.WOODEN_HOE))) {
-            System.out.println("OK Boomer 2");
             if (quirk_time > 0) return;
             if (quirk_name == null) return;
             if (player == null) return;
@@ -105,6 +104,7 @@ public class quirk_class {
             } else if (quirk_name.equalsIgnoreCase("Permeation")) {
                 if (player.getItemInHand().getType() == Material.STICK) {
                     if (player_action.equals(Action.RIGHT_CLICK_AIR) || player_action.equals(Action.RIGHT_CLICK_BLOCK)) {
+                        player.setFlySpeed(0.02f);
                         player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 10000, 10000));
                         player.setGameMode(GameMode.SPECTATOR);
                         plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -112,6 +112,7 @@ public class quirk_class {
                             public void run() {
                                 player.setGameMode(GameMode.SURVIVAL);
                                 player.removePotionEffect(PotionEffectType.BLINDNESS);
+                                player.setFlySpeed(1f);
                                 quirk_time = plugin.getConfig().getInt("Delay.Permeation");
                             }
                         }, 80);
@@ -120,9 +121,16 @@ public class quirk_class {
             } else if (quirk_name.equalsIgnoreCase("Warp")) {
                 if (player.getItemInHand().getType() == Material.STICK) {
                     if (player_action.equals(Action.RIGHT_CLICK_AIR) || player_action.equals(Action.RIGHT_CLICK_BLOCK)) {
-                        Location new_location = player.getLocation().add((random.nextInt(100) - 50), (random.nextInt(100) - 50), (random.nextInt(100) - 50));
-                        player.teleport(new Location(new_location.getWorld(), new_location.getX(), new_location.getWorld().getHighestBlockYAt(new_location), new_location.getZ()));
-                        quirk_time = plugin.getConfig().getInt("Delay.Warp");
+                        int random_player = random.nextInt(player.getServer().getOnlinePlayers().size());
+                        for(Player p : plugin.getServer().getOnlinePlayers()){
+                            if(random_player == 0){
+                                player.teleport(p.getLocation());
+                            }
+                            else if(p.getGameMode() == GameMode.SPECTATOR) {
+                                random_player = random_player - 1;
+                            }
+                            quirk_time = plugin.getConfig().getInt("Delay.Warp");
+                        }
                     } else if (attacked_player != null) {
                         Location new_location = player.getLocation().add((random.nextInt(100) - 50), (random.nextInt(100) - 50), (random.nextInt(100) - 50));
                         attacked_player.teleport(new Location(new_location.getWorld(), new_location.getX(), new_location.getWorld().getHighestBlockYAt(new_location), new_location.getZ()));
@@ -155,18 +163,26 @@ public class quirk_class {
                 }
                 }
             else if (quirk_name.equalsIgnoreCase("Explosion")) {
-                System.out.println("OK Boomer 3");
                 if (player_action.equals(Action.LEFT_CLICK_BLOCK) || player_action.equals(Action.LEFT_CLICK_AIR)) {
-                    System.out.println("OK Boomer 4");
                     player.getWorld().spawn(player.getLocation(), TNTPrimed.class).setVelocity(player.getLocation().getDirection().multiply(2));
                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                         @Override
                         public void run() {
-                            System.out.println("OK Boomer 5");
                             player.getWorld().spawn(player.getLocation(), TNTPrimed.class).setVelocity(player.getLocation().getDirection().multiply(2));
                             quirk_time = plugin.getConfig().getInt("Delay.Explosion");
                         }
                     }, 10);
+                }
+            }
+            else if(quirk_name.equalsIgnoreCase("Paralyze")){
+                if(attacked_player != null){
+                    plugin.player_quirks.get(attacked_player).paralyze = true;
+                    plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            plugin.player_quirks.get(attacked_player).paralyze = false;
+                        }
+                    },100);
                 }
             }
         }

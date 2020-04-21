@@ -13,6 +13,7 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.awt.*;
 import java.util.HashMap;
 
 
@@ -38,20 +39,35 @@ public final class MHAMinecraft extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        String text = "";
+        for(Player p:getServer().getOnlinePlayers()) {
+             text = p.getDisplayName() + " has "+ getConfig().getInt("Points.Team_"+player_quirks.get(p).team_id)+ " points ";
+            eventHandler.discord_handler_object.send_message(text);
+        }
         super.onDisable();
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(sender instanceof Player){
+            Player p = (Player) sender;
             if(sender.isOp()){
                 if(args.length <= 0){
                     if(command.getName().equalsIgnoreCase("start")){
                         return start_game(sender);
                     }
+                    else if(command.getName().equalsIgnoreCase("top")){
+                        if(player_quirks.get(p).quirk_time != 0)return false;
+                        int x = (int) p.getLocation().getX();
+                        int z = (int) p.getLocation().getZ();
+                        int y = p.getWorld().getHighestBlockYAt(x,z) + 1;
+                        p.teleport(new Location(p.getWorld(),x,y,z));
+                        player_quirks.get(p).quirk_time = getConfig().getInt("Delay."+player_quirks.get(p).quirk_name);
+                        return true;
+                    }
                     else if(command.getName().equalsIgnoreCase("points")){
-                        for(Player p: getServer().getOnlinePlayers()){
-                            sender.sendMessage(p.getDisplayName() + " Has " + getConfig().getInt("Points.Team_"+player_quirks.get(p).team_id) + " Points ");
+                        for(Player pl: getServer().getOnlinePlayers()){
+                            sender.sendMessage(pl.getDisplayName() + " Has " + getConfig().getInt("Points.Team_"+player_quirks.get(pl).team_id) + " Points ");
                         }
                         return true;
                     }
@@ -82,9 +98,18 @@ public final class MHAMinecraft extends JavaPlugin {
                 }
                 else if(args.length <= 0){
                     if(command.getName().equalsIgnoreCase("points")){
-                        for(Player p: getServer().getOnlinePlayers()){
-                            sender.sendMessage(p.getDisplayName() + " Has " + getConfig().getInt("Points.Team_"+player_quirks.get(p).team_id) + " Points ");
+                        for(Player pl: getServer().getOnlinePlayers()){
+                            sender.sendMessage(pl.getDisplayName() + " Has " + getConfig().getInt("Points.Team_"+player_quirks.get(pl).team_id) + " Points ");
                         }
+                        return true;
+                    }
+                    else if(command.getName().equalsIgnoreCase("top")){
+                        if(player_quirks.get(p).quirk_time != 0)return false;
+                        int x = (int) p.getLocation().getX();
+                        int z = (int) p.getLocation().getZ();
+                        int y = p.getWorld().getHighestBlockYAt(x,z) + 1;
+                        p.teleport(new Location(p.getWorld(),x,y,z));
+                        player_quirks.get(p).quirk_time = getConfig().getInt("Delay."+player_quirks.get(p).quirk_name);
                         return true;
                     }
                 }
@@ -157,24 +182,24 @@ public final class MHAMinecraft extends JavaPlugin {
         eventHandler = new event_handler(this);
         return true;
     }
-    private boolean update_token(String args[]){
+    private boolean update_token(String[] args){
         getConfig().set("Discord.Token",args[0]);
         saveConfig();
         return true;
     }
-    private boolean update_text_channel(String args[]){
+    private boolean update_text_channel(String[] args){
         getConfig().set("Discord.Text_Channel",Long.parseLong(args[0]));
         saveConfig();
         return true;
     }
-    private boolean update_quirk(CommandSender sender,String args[]){
+    private boolean update_quirk(CommandSender sender, String[] args){
         Player p = (Player) sender;
         this.getConfig().set("Class."+p.getDisplayName(), (args[0]));
         this.saveConfig();
         p.sendMessage("Your Quirk has been switched");
         return true;
     }
-    private boolean update_team(CommandSender sender,String args[]){
+    private boolean update_team(CommandSender sender, String[] args){
         Player p = (Player) sender;
         this.getConfig().set("Team."+p.getDisplayName(), Integer.parseInt(args[0]));
         this.saveConfig();
