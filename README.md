@@ -15,7 +15,7 @@
 * Gravity
     * Stick
         * Right Click
-            * Teleports Player 100 blocks above current position and gives 30 second slow falling potion effect
+            * Teleports Player 50 blocks above current position and gives 30 second slow falling potion effect
         * Player Hit
             * Teleport All nearby enteties 10 blocks above user
 * Warp

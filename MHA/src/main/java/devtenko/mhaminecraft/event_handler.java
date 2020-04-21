@@ -76,6 +76,7 @@ public class event_handler implements Listener {
         if(e.getEntity().getKiller() instanceof Player){
             Player killer = e.getEntity().getKiller();
             plugin.getConfig().set("Points.Team_"+plugin.player_quirks.get(killer).team_id,plugin.getConfig().getInt("Points.Team_"+plugin.player_quirks.get(killer).team_id)  + 1);
+            killer.setHealth(killer.getHealth() + 10);
         }
         if (!team_id_list.containsValue(e.getEntity().getPlayer())) {
             if (team_id_list.values().size() == 2) {
