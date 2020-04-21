@@ -1,5 +1,5 @@
 name: MHAMinecraft
-version: 5.0
+version: 5.2
 main: devtenko.mhaminecraft.MHAMinecraft
 api-version: 1.13
 authors: [DevTenko]
@@ -25,3 +25,6 @@ commands:
   points:
     usage: "Usage: /points"
     description: Gets points for all players
+  top:
+    usage: "Usage: /top"
+    description: teleports to highest block

@@ -4,12 +4,14 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.List;
 import java.util.Random;
 
 public class quirk_class {
@@ -121,15 +123,16 @@ public class quirk_class {
             } else if (quirk_name.equalsIgnoreCase("Warp")) {
                 if (player.getItemInHand().getType() == Material.STICK) {
                     if (player_action.equals(Action.RIGHT_CLICK_AIR) || player_action.equals(Action.RIGHT_CLICK_BLOCK)) {
-                        int random_player = random.nextInt(player.getServer().getOnlinePlayers().size());
-                        for(Player p : plugin.getServer().getOnlinePlayers()){
-                            if(random_player == 0){
-                                player.teleport(p.getLocation());
+                        List<Entity> e=  player.getNearbyEntities(150,150,150);
+                        for(Entity e1 : e){
+                            if(e1 instanceof Player){
+                                if(((Player) e1).getPlayer().getGameMode() == GameMode.SURVIVAL){
+                                    player.teleport(e1.getLocation());
+                                    quirk_time = plugin.getConfig().getInt("Delay.Warp");
+                                    return;
+                                }
                             }
-                            else if(p.getGameMode() == GameMode.SPECTATOR) {
-                                random_player = random_player - 1;
-                            }
-                            quirk_time = plugin.getConfig().getInt("Delay.Warp");
+
                         }
                     } else if (attacked_player != null) {
                         Location new_location = player.getLocation().add((random.nextInt(100) - 50), (random.nextInt(100) - 50), (random.nextInt(100) - 50));
@@ -181,6 +184,7 @@ public class quirk_class {
                         @Override
                         public void run() {
                             plugin.player_quirks.get(attacked_player).paralyze = false;
+                            quirk_time = plugin.getConfig().getInt("Delay.Paralyze");
                         }
                     },100);
                 }

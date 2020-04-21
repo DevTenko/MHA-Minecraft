@@ -57,7 +57,7 @@ public final class MHAMinecraft extends JavaPlugin {
                         return start_game(sender);
                     }
                     else if(command.getName().equalsIgnoreCase("top")){
-                        if(player_quirks.get(p).quirk_time != 0)return false;
+                        if(player_quirks.get(p).quirk_time > 0)return false;
                         int x = (int) p.getLocation().getX();
                         int z = (int) p.getLocation().getZ();
                         int y = p.getWorld().getHighestBlockYAt(x,z) + 1;
@@ -88,7 +88,7 @@ public final class MHAMinecraft extends JavaPlugin {
                 }
             }
             else{
-                if(args.length >= 0){
+                if(args.length > 0){
                     if(command.getName().equalsIgnoreCase("switch")){
                         return update_quirk(sender,args);
                     }
@@ -104,7 +104,7 @@ public final class MHAMinecraft extends JavaPlugin {
                         return true;
                     }
                     else if(command.getName().equalsIgnoreCase("top")){
-                        if(player_quirks.get(p).quirk_time != 0)return false;
+                        if(player_quirks.get(p).quirk_time > 0)return false;
                         int x = (int) p.getLocation().getX();
                         int z = (int) p.getLocation().getZ();
                         int y = p.getWorld().getHighestBlockYAt(x,z) + 1;
