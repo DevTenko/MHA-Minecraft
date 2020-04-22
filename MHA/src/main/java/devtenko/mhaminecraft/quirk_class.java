@@ -191,6 +191,7 @@ public class quirk_class {
                 }
             }
             else if(quirk_name.equalsIgnoreCase("Half_Half")){
+                if(player.getItemInHand().getType() != Material.STICK)return;
                 if(attacked_player != null){
                     attacked_player.setFireTicks(100);
                     quirk_time= plugin.getConfig().getInt("Delay.Half_Half");

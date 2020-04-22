@@ -82,6 +82,7 @@ public class world_border {
                     airdrop_chest.getInventory().addItem(new ItemStack(Material.DIAMOND_ORE, 3));
                 }
             }
+            plugin.getServer().broadcastMessage("Airdrop at: "+ airdrop.getLocation());
         }
     }
 }

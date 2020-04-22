@@ -44,3 +44,10 @@
     * Stick
         * On Player Hit
             * Disables player movement for 5 seconds
+            
+* Half_Half
+    * Stick
+        * On Player hit
+            * Sets player on fire
+        * Right Click Block
+            * Generates 5 x 4 x 5 Ice Block
