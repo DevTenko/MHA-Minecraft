@@ -21,8 +21,9 @@ public class config_manager {
             plugin.getConfig().set("Delay.Compress",7);
             plugin.getConfig().set("Delay.Warp",7);
             plugin.getConfig().set("Delay.Explosion",7);
-            plugin.getConfig().set("Delay.Permeation",7);
+            plugin.getConfig().set("Delay.Permeation",15);
             plugin.getConfig().set("Delay.Eraser",7);
+            plugin.getConfig().set("Delay.Half_Half",7);
             plugin.getConfig().set("Points.Hobo_Bleach",0);
             plugin.saveConfig();
         }

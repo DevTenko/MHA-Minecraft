@@ -10,6 +10,7 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.block.Action;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.Random;
@@ -187,6 +188,23 @@ public class quirk_class {
                             quirk_time = plugin.getConfig().getInt("Delay.Paralyze");
                         }
                     },100);
+                }
+            }
+            else if(quirk_name.equalsIgnoreCase("Half_Half")){
+                if(attacked_player != null){
+                    attacked_player.setFireTicks(100);
+                    quirk_time= plugin.getConfig().getInt("Delay.Half_Half");
+                }
+                else if(player_action == Action.RIGHT_CLICK_BLOCK){
+                    for(int x = -5;x < 5;x++){
+                        for(int z = -5; z< 5;z++){
+                            for(int y = 0;y < 3;y++){
+                                player.getWorld().getBlockAt((int)player.getLocation().getX()+ x,(int)player.getLocation().getY() +y,(int)player.getLocation().getZ() +z).setType(Material.ICE);
+                                quirk_time= plugin.getConfig().getInt("Delay.Half_Half");
+                            }
+                        }
+                    }
+                    player.teleport(new Location(player.getWorld(),player.getLocation().getX(),player.getWorld().getHighestBlockYAt(player.getLocation()),player.getLocation().getZ()));
                 }
             }
         }
