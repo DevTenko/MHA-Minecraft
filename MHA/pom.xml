@@ -6,7 +6,7 @@
 
     <groupId>DevTenko</groupId>
     <artifactId>MHAMinecraft</artifactId>
-    <version>1.0</version>
+    <version>5.2</version>
     <packaging>jar</packaging>
 
     <name>MHAMinecraft</name>

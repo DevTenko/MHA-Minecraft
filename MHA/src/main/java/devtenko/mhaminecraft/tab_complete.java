@@ -20,6 +20,7 @@ public class tab_complete implements TabCompleter {
             valid_classes.add("Permeation");
             valid_classes.add("Explosion");
             valid_classes.add("Paralyze");
+            valid_classes.add("Half_Half");
             return valid_classes;
         }
         return null;

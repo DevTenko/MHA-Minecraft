@@ -191,29 +191,20 @@ public class quirk_class {
                 }
             }
             else if(quirk_name.equalsIgnoreCase("Half_Half")){
-                if(player_action == Action.LEFT_CLICK_AIR || player_action == Action.LEFT_CLICK_BLOCK){
-                    Vector direction = player.getLocation().getDirection().normalize();
-                    Location player_location = player.getLocation();
-                    int x = (int) Math.round(direction.getX());
-                    int z = (int) Math.round(direction.getZ());
-                    for(int i = -2; i < 2; i++){
-                        if(x != 0){
-                            z = z + 1;
-                            player_location.setZ(player_location.getZ() + z);
-                            for(int p = 0; p < 5; p++) {
-                                player_location.add(direction.add(direction.multiply(p)));
-                                player_location.getBlock().setType(Material.FIRE);
-                            }
-                        }
-                        else if(z != 0){
-                            z = z + 1;
-                            player_location.setX(player_location.getX() + x);
-                            for(int p = 0; p < 5; p++) {
-                                player_location.add(direction.add(direction.multiply(p)));
-                                player_location.getBlock().setType(Material.FIRE);
+                if(attacked_player != null){
+                    attacked_player.setFireTicks(100);
+                    quirk_time= plugin.getConfig().getInt("Delay.Half_Half");
+                }
+                else if(player_action == Action.RIGHT_CLICK_BLOCK){
+                    for(int x = -5;x < 5;x++){
+                        for(int z = -5; z< 5;z++){
+                            for(int y = 0;y < 3;y++){
+                                player.getWorld().getBlockAt((int)player.getLocation().getX()+ x,(int)player.getLocation().getY() +y,(int)player.getLocation().getZ() +z).setType(Material.ICE);
+                                quirk_time= plugin.getConfig().getInt("Delay.Half_Half");
                             }
                         }
                     }
+                    player.teleport(new Location(player.getWorld(),player.getLocation().getX(),player.getWorld().getHighestBlockYAt(player.getLocation()),player.getLocation().getZ()));
                 }
             }
         }
