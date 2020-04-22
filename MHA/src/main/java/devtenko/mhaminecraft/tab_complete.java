@@ -21,6 +21,8 @@ public class tab_complete implements TabCompleter {
             valid_classes.add("Explosion");
             valid_classes.add("Paralyze");
             valid_classes.add("Half_Half");
+            valid_classes.add("FatGum");
+            valid_classes.add("Rappa");
             return valid_classes;
         }
         return null;

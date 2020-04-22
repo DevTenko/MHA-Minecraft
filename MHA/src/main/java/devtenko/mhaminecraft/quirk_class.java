@@ -24,8 +24,10 @@ public class quirk_class {
     Action player_action;
     Random random;
     boolean paralyze = false;
+    private double fatgum_damage = 0;
     int team_id;
-    public quirk_class(MHAMinecraft plugin, Player p, String quirk_name,int team_id){
+
+    public quirk_class(MHAMinecraft plugin, Player p, String quirk_name, int team_id) {
         this.player = p;
         this.quirk_name = quirk_name;
         this.quirk_time = 0;
@@ -34,8 +36,8 @@ public class quirk_class {
         this.random = new Random();
     }
 
-    public void activate(){
-        if((player.getItemInHand().getType().equals(Material.STICK) || player.getItemInHand().equals(Material.WOODEN_HOE))) {
+    public void activate() {
+        if ((player.getItemInHand().getType().equals(Material.STICK) || player.getItemInHand().equals(Material.WOODEN_HOE))) {
             if (quirk_time > 0) return;
             if (quirk_name == null) return;
             if (player == null) return;
@@ -124,10 +126,10 @@ public class quirk_class {
             } else if (quirk_name.equalsIgnoreCase("Warp")) {
                 if (player.getItemInHand().getType() == Material.STICK) {
                     if (player_action.equals(Action.RIGHT_CLICK_AIR) || player_action.equals(Action.RIGHT_CLICK_BLOCK)) {
-                        List<Entity> e=  player.getNearbyEntities(150,150,150);
-                        for(Entity e1 : e){
-                            if(e1 instanceof Player){
-                                if(((Player) e1).getPlayer().getGameMode() == GameMode.SURVIVAL){
+                        List<Entity> e = player.getNearbyEntities(150, 150, 150);
+                        for (Entity e1 : e) {
+                            if (e1 instanceof Player) {
+                                if (((Player) e1).getPlayer().getGameMode() == GameMode.SURVIVAL) {
                                     player.teleport(e1.getLocation());
                                     quirk_time = plugin.getConfig().getInt("Delay.Warp");
                                     return;
@@ -165,8 +167,7 @@ public class quirk_class {
                         }
                     }
                 }
-                }
-            else if (quirk_name.equalsIgnoreCase("Explosion")) {
+            } else if (quirk_name.equalsIgnoreCase("Explosion")) {
                 if (player_action.equals(Action.LEFT_CLICK_BLOCK) || player_action.equals(Action.LEFT_CLICK_AIR)) {
                     player.getWorld().spawn(player.getLocation(), TNTPrimed.class).setVelocity(player.getLocation().getDirection().multiply(2));
                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
@@ -177,9 +178,8 @@ public class quirk_class {
                         }
                     }, 10);
                 }
-            }
-            else if(quirk_name.equalsIgnoreCase("Paralyze")){
-                if(attacked_player != null){
+            } else if (quirk_name.equalsIgnoreCase("Paralyze")) {
+                if (attacked_player != null) {
                     plugin.player_quirks.get(attacked_player).paralyze = true;
                     plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
                         @Override
@@ -187,25 +187,50 @@ public class quirk_class {
                             plugin.player_quirks.get(attacked_player).paralyze = false;
                             quirk_time = plugin.getConfig().getInt("Delay.Paralyze");
                         }
-                    },100);
+                    }, 100);
                 }
-            }
-            else if(quirk_name.equalsIgnoreCase("Half_Half")){
-                if(player.getItemInHand().getType() != Material.STICK)return;
-                if(attacked_player != null){
+            } else if (quirk_name.equalsIgnoreCase("Half_Half")) {
+                if (player.getItemInHand().getType() != Material.STICK) return;
+                if (attacked_player != null) {
                     attacked_player.setFireTicks(100);
-                    quirk_time= plugin.getConfig().getInt("Delay.Half_Half");
-                }
-                else if(player_action == Action.RIGHT_CLICK_BLOCK){
-                    for(int x = -5;x < 5;x++){
-                        for(int z = -5; z< 5;z++){
-                            for(int y = 0;y < 3;y++){
-                                player.getWorld().getBlockAt((int)player.getLocation().getX()+ x,(int)player.getLocation().getY() +y,(int)player.getLocation().getZ() +z).setType(Material.ICE);
-                                quirk_time= plugin.getConfig().getInt("Delay.Half_Half");
+                    quirk_time = plugin.getConfig().getInt("Delay.Half_Half");
+                } else if (player_action == Action.RIGHT_CLICK_BLOCK) {
+                    for (int x = -5; x < 5; x++) {
+                        for (int z = -5; z < 5; z++) {
+                            for (int y = 0; y < 3; y++) {
+                                player.getWorld().getBlockAt((int) player.getLocation().getX() + x, (int) player.getLocation().getY() + y, (int) player.getLocation().getZ() + z).setType(Material.ICE);
+                                quirk_time = plugin.getConfig().getInt("Delay.Half_Half");
                             }
                         }
                     }
-                    player.teleport(new Location(player.getWorld(),player.getLocation().getX(),player.getWorld().getHighestBlockYAt(player.getLocation()),player.getLocation().getZ()));
+                    player.teleport(new Location(player.getWorld(), player.getLocation().getX(), player.getWorld().getHighestBlockYAt(player.getLocation()), player.getLocation().getZ()));
+                }
+            } else if (quirk_name.equalsIgnoreCase("Rappa")) {
+                if (player.getItemInHand().getType() == Material.STICK) {
+                    if (attacked_player != null) {
+                        Player saved_attack_player = attacked_player;
+                        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+                            @Override
+                            public void run() {
+                                    saved_attack_player.damage(8);
+                                }
+                        },5);
+                    }
+                    quirk_time = plugin.getConfig().getInt("Delay." + "Rappa");
+                }
+            } else if (quirk_name.equalsIgnoreCase("FatGum")) {
+                if (player.getItemInHand().getType() == Material.STICK) {
+                    if (player_action == Action.RIGHT_CLICK_AIR || player_action == Action.RIGHT_CLICK_BLOCK) {
+                        fatgum_damage = fatgum_damage + player.getLastDamage();
+                        quirk_time = plugin.getConfig().getInt("Delay.FatGum");
+                    }
+                    else if (attacked_player != null) {
+                        System.out.println(fatgum_damage);
+                        System.out.println(player.getLastDamage());
+                        attacked_player.damage(fatgum_damage * 1.25);
+                        fatgum_damage = 0;
+                        quirk_time = plugin.getConfig().getInt("Delay.FatGum");
+                    }
                 }
             }
         }

@@ -6,7 +6,7 @@ public class config_manager {
     MHAMinecraft plugin;
     public config_manager(MHAMinecraft plugin) {
         this.plugin = plugin;
-        if (plugin.getConfig().contains("Class") && plugin.getConfig().contains("Timer") && plugin.getConfig().contains("World") && plugin.getConfig().contains("Discord") && plugin.getConfig().contains("Delay") && plugin.getConfig().contains("Gamemode") && plugin.getConfig().contains("Points")) {
+        if (plugin.getConfig().contains("Class") && plugin.getConfig().contains("Timer") && plugin.getConfig().contains("World") && plugin.getConfig().contains("Discord") && plugin.getConfig().contains("Delay") && plugin.getConfig().contains("Points")) {
             return;
         } else {
             plugin.getConfig().set("Class.Hobo_Bleach", "Eraser");
@@ -24,6 +24,8 @@ public class config_manager {
             plugin.getConfig().set("Delay.Permeation",15);
             plugin.getConfig().set("Delay.Eraser",7);
             plugin.getConfig().set("Delay.Half_Half",7);
+            plugin.getConfig().set("Delay.Rappa",7);
+            plugin.getConfig().set("Delay.FatGum",3);
             plugin.getConfig().set("Points.Hobo_Bleach",0);
             plugin.saveConfig();
         }
