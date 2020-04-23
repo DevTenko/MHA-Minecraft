@@ -12,8 +12,6 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
-
-import java.awt.*;
 import java.util.HashMap;
 
 
@@ -22,7 +20,8 @@ public final class MHAMinecraft extends JavaPlugin {
     private event_handler eventHandler;
     private config_manager configManager;
     private world_border world_border_object;
-    protected HashMap<Player,quirk_class> player_quirks = new HashMap<Player, quirk_class>();
+    protected HashMap<Player,Object> player_quirks = new HashMap<Player, Object>();
+
     @Override
     public void onEnable() {
         configManager = new config_manager(this);
@@ -55,15 +54,6 @@ public final class MHAMinecraft extends JavaPlugin {
                 if(args.length <= 0){
                     if(command.getName().equalsIgnoreCase("start")){
                         return start_game(sender);
-                    }
-                    else if(command.getName().equalsIgnoreCase("top")){
-                        if(player_quirks.get(p).quirk_time > 0)return false;
-                        int x = (int) p.getLocation().getX();
-                        int z = (int) p.getLocation().getZ();
-                        int y = p.getWorld().getHighestBlockYAt(x,z) + 1;
-                        p.teleport(new Location(p.getWorld(),x,y,z));
-                        player_quirks.get(p).quirk_time = getConfig().getInt("Delay."+player_quirks.get(p).quirk_name);
-                        return true;
                     }
                     else if(command.getName().equalsIgnoreCase("points")){
                         for(Player pl: getServer().getOnlinePlayers()){
@@ -101,15 +91,6 @@ public final class MHAMinecraft extends JavaPlugin {
                         for(Player pl: getServer().getOnlinePlayers()){
                             sender.sendMessage(pl.getDisplayName() + " Has " + getConfig().getInt("Points.Team_"+player_quirks.get(pl).team_id) + " Points ");
                         }
-                        return true;
-                    }
-                    else if(command.getName().equalsIgnoreCase("top")){
-                        if(player_quirks.get(p).quirk_time > 0)return false;
-                        int x = (int) p.getLocation().getX();
-                        int z = (int) p.getLocation().getZ();
-                        int y = p.getWorld().getHighestBlockYAt(x,z) + 1;
-                        p.teleport(new Location(p.getWorld(),x,y,z));
-                        player_quirks.get(p).quirk_time = getConfig().getInt("Delay."+player_quirks.get(p).quirk_name);
                         return true;
                     }
                 }
