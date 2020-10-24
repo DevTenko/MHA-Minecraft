@@ -12,15 +12,23 @@ public class timer {
 	}
 	
 	protected void start() {
+		
+		// General Clock Keeper
 		new BukkitRunnable() {
 			
 			@Override
 			public void run() {
 				clockKeeper = clockKeeper + 2;
-				if(clockKeeper - 6000 == 0) {
-					
-				}
 			}
 		}.runTaskTimer(plugin, 0, 40);
+		
+		// World Border Timer
+		new BukkitRunnable() {
+			
+			@Override
+			public void run() {
+				worldBorder.shrink();
+			}
+		}.runTaskTimer(plugin, 12000, 12000);
 	}
 }
