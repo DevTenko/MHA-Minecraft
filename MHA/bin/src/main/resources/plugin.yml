@@ -1,0 +1,30 @@
+name: MHAMinecraft
+version: ${project.version}
+main: devtenko.mhaminecraft.MHAMinecraft
+api-version: 1.13
+authors: [DevTenko]
+commands:
+  start:
+    usage: "Usage: /start"
+    description: Starts game only for OP
+  discord_token:
+    usage: "Usage: /discord_token"
+    description: Sets Discord Token only for OP
+  discord_text_channel:
+    usage: "Usage: /discord_text_channel"
+    description: Sets Discord Text Channel only for OP
+  discord_guild_id:
+    usage: "Usage: /discord_guild_id"
+    description: Sets Discord Guild ID only for OP
+  switch:
+    usage: "Usage: /switch [Quirk]"
+    description: Works for all players before game start
+  team:
+    usage: "Usage: /team [team id]"
+    description: Works for all players before game start
+  points:
+    usage: "Usage: /points"
+    description: Gets points for all players
+  top:
+    usage: "Usage: /top"
+    description: teleports to highest block
