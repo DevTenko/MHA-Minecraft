@@ -1,8 +1,8 @@
 name: MHAMinecraft
 version: ${project.version}
-main: devtenko.mhaminecraft.MHAMinecraft
+main: devtenko.mhaminecraft.main
 api-version: 1.13
-authors: [DevTenko]
+authors: [BoboHleach]
 commands:
   start:
     usage: "Usage: /start"
