@@ -1,5 +1,5 @@
 name: MHAMinecraft
-version: 7.0
+version: 6.1
 main: devtenko.mhaminecraft.MHAMinecraft
 api-version: 1.13
 authors: [DevTenko]

@@ -51,7 +51,6 @@ public class event_handler implements Listener {
                 plugin.player_quirks.get(((Player) e.getDamager()).getPlayer()).attacked_player = null;
             }
             plugin.player_quirks.get(((Player) e.getDamager()).getPlayer()).activate();
-            plugin.player_quirks.get(((Player) e.getDamager()).getPlayer()).attacked_player = null;
         }
     }
 
@@ -68,7 +67,6 @@ public class event_handler implements Listener {
         if(plugin.player_quirks.get(e.getPlayer()).quirk_time <=0) {
             plugin.player_quirks.get(e.getPlayer()).player_action = e.getAction();
             plugin.player_quirks.get(e.getPlayer()).activate();
-            plugin.player_quirks.get(e.getPlayer()).player_action = null;
         }
     }
 
